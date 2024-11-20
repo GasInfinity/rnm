@@ -52,29 +52,36 @@ namespace rnm
     {
         // This is the most overengineered matrix multiplication :skull:
         template<typename T, std::size_t CR, std::size_t R, std::size_t O, std::size_t... I>
-        rnm_forceinline constexpr vec<T, CR> mat_lhs_vec_helper(const mat<T, R, CR>& lhs, const std::index_sequence<I...>&)
-        { return vec<T, CR>(lhs[O, I]...); }
+        rnm_forceinline constexpr ::rnm::vec<T, CR> mat_lhs_vec_helper(const ::rnm::mat<T, R, CR>& lhs, const std::index_sequence<I...>&)
+        { return ::rnm::vec<T, CR>(lhs[O, I]...); }
 
         template<typename T, std::size_t CR, std::size_t C, std::size_t O, std::size_t... I>
-        rnm_forceinline constexpr vec<T, CR> mat_rhs_vec_helper(const mat<T, CR, C>& rhs, const std::index_sequence<I...>&)
-        { return vec<T, CR>(rhs[I, O]...); }
+        rnm_forceinline constexpr ::rnm::vec<T, CR> mat_rhs_vec_helper(const ::rnm::mat<T, CR, C>& rhs, const std::index_sequence<I...>&)
+        { return ::rnm::vec<T, CR>(rhs[I, O]...); }
 
         template<typename T, std::size_t CR, std::size_t R, std::size_t C, std::size_t... I>
-        rnm_forceinline constexpr mat<T, R, C> mat_mul_helper(const mat<T, R, CR>& lhs, const mat<T, CR, C>& rhs, const std::index_sequence<I...>&)
-        { return mat<T, R, C>(dot_helper(mat_lhs_vec_helper<T, CR, R, (I / C)>(lhs, std::make_index_sequence<CR>{}), mat_rhs_vec_helper<T, CR, C, (I % C)>(rhs, std::make_index_sequence<CR>{}), std::make_index_sequence<CR>{})...); }
+        rnm_forceinline constexpr ::rnm::mat<T, R, C> mat_mul_helper(const ::rnm::mat<T, R, CR>& lhs, const ::rnm::mat<T, CR, C>& rhs, const std::index_sequence<I...>&)
+        { return ::rnm::mat<T, R, C>(::rnm::dot(mat_lhs_vec_helper<T, CR, R, (I / C)>(lhs, std::make_index_sequence<CR>{}), mat_rhs_vec_helper<T, CR, C, (I % C)>(rhs, std::make_index_sequence<CR>{}))...); }
     }
 
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator+=(mat<T, R, C>& lhs, const mat<T, R, C>& rhs) { return detail::addr_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator-=(mat<T, R, C>& lhs, const mat<T, R, C>& rhs) { return detail::subr_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator*=(mat<T, R, C>& lhs, T rhs) { return detail::mulr_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator/=(mat<T, R, C>& lhs, T rhs) { return detail::divr_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
+
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator*=(mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::mulr_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<R*C>{}); }
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator/=(mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::divr_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<R*C>{}); }
 
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator -(const mat<T, R, C>& lhs) { return detail::neg_helper(lhs, std::make_index_sequence<R*C>{}); }
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator +(const mat<T, R, C>& lhs, const mat<T, R, C>& rhs) { return detail::add_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator -(const mat<T, R, C>& lhs, const mat<T, R, C>& rhs) { return detail::sub_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(const mat<T, R, C>& lhs, T rhs) { return detail::mul_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(T lhs, const mat<T, R, C>& rhs) { return detail::mul_helper(rhs, lhs, std::make_index_sequence<R*C>{}); }
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator /(const mat<T, R, C>& lhs, T rhs) { return detail::div_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
+
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(const mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::mul_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<R*C>{}); }
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(U lhs, const mat<T, R, C>& rhs) requires std::is_convertible_v<U, T>
+    { return detail::mul_helper(rhs, static_cast<T>(lhs), std::make_index_sequence<R*C>{}); }
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator /(const mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::div_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<R*C>{}); }
 
     template<typename T, std::size_t CR, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(const mat<T, R, CR>& lhs, const mat<T, CR, C>& rhs) { return detail::mat_mul_helper(lhs, rhs, std::make_index_sequence<R*C>{}); }
 

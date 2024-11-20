@@ -1,6 +1,7 @@
 #ifndef _RENA_MATHEMATICS_VEC_HPP_
 #define _RENA_MATHEMATICS_VEC_HPP_
 
+#include <type_traits>
 #include <cstddef>
 
 namespace rnm
@@ -10,15 +11,15 @@ namespace rnm
 
     template<typename T, std::size_t N> inline constexpr vec<T, N>& operator+=(vec<T, N>& lhs, const vec<T, N>& rhs);
     template<typename T, std::size_t N> inline constexpr vec<T, N>& operator-=(vec<T, N>& lhs, const vec<T, N>& rhs);
-    template<typename T, std::size_t N> inline constexpr vec<T, N>& operator*=(vec<T, N>& lhs, T rhs);
-    template<typename T, std::size_t N> inline constexpr vec<T, N>& operator/=(vec<T, N>& lhs, T rhs);
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N>& operator*=(vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>;
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N>& operator/=(vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>;
 
     template<typename T, std::size_t N> inline constexpr vec<T, N> operator-(const vec<T, N>& lhs);
     template<typename T, std::size_t N> inline constexpr vec<T, N> operator+(const vec<T, N>& lhs, const vec<T, N>& rhs);
     template<typename T, std::size_t N> inline constexpr vec<T, N> operator-(const vec<T, N>& lhs, const vec<T, N>& rhs);
-    template<typename T, std::size_t N> inline constexpr vec<T, N> operator*(const vec<T, N>& lhs, T rhs);
-    template<typename T, std::size_t N> inline constexpr vec<T, N> operator*(T lhs, const vec<T, N>& rhs);
-    template<typename T, std::size_t N> inline constexpr vec<T, N> operator/(const vec<T, N>& lhs, T rhs);
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N> operator*(const vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>;
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N> operator*(U lhs, const vec<T, N>& rhs) requires std::is_convertible_v<U, T>;
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N> operator/(const vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>;
 
     template<typename T, std::size_t N> inline constexpr vec<T, N> mul(const vec<T, N>& lhs, const vec<T, N>& rhs);
     template<typename T, std::size_t N> inline constexpr T dot(const vec<T, N>& lhs, const vec<T, N>& rhs);

@@ -13,13 +13,15 @@ namespace rnm
 {
     namespace detail
     {
+        template<typename T, std::size_t N> requires (N != 0)
+        struct vec;
+
         template<typename T, std::size_t N, std::size_t I>
         struct accessor_helper
         {
             T data[N];
 
             rnm_forceinline constexpr accessor_helper<T, N, I>& operator=(const T& rhs) { this->data[I] = rhs; return *this; }
-            accessor_helper<T, N, I>& operator=(const accessor_helper<T, N, I>& rhs) = delete;
 
             rnm_forceinline constexpr operator T&() { return this->data[I]; }
             rnm_forceinline constexpr operator const T&() const { return this->data[I]; }
@@ -162,21 +164,28 @@ namespace rnm
 
     template<typename T, std::size_t N> inline constexpr vec<T, N>& operator+=(vec<T, N>& lhs, const vec<T, N>& rhs) { return detail::addr_helper(lhs, rhs, std::make_index_sequence<N>{}); }
     template<typename T, std::size_t N> inline constexpr vec<T, N>& operator-=(vec<T, N>& lhs, const vec<T, N>& rhs) { return detail::subr_helper(lhs, rhs, std::make_index_sequence<N>{}); }
-    template<typename T, std::size_t N> inline constexpr vec<T, N>& operator*=(vec<T, N>& lhs, T rhs) { return detail::mulr_helper(lhs, rhs, std::make_index_sequence<N>{}); }
-    template<typename T, std::size_t N> inline constexpr vec<T, N>& operator/=(vec<T, N>& lhs, T rhs) { return detail::divr_helper(lhs, rhs, std::make_index_sequence<N>{}); }
+
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N>& operator*=(vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::mulr_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<N>{}); }
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N>& operator/=(vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::divr_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<N>{}); }
 
     template<typename T, std::size_t N> inline constexpr vec<T, N> operator-(const vec<T, N>& lhs) { return detail::neg_helper(lhs, std::make_index_sequence<N>{}); }
     template<typename T, std::size_t N> inline constexpr vec<T, N> operator+(const vec<T, N>& lhs, const vec<T, N>& rhs) { return detail::add_helper(lhs, rhs, std::make_index_sequence<N>{}); }
     template<typename T, std::size_t N> inline constexpr vec<T, N> operator-(const vec<T, N>& lhs, const vec<T, N>& rhs) { return detail::sub_helper(lhs, rhs, std::make_index_sequence<N>{}); }
-    template<typename T, std::size_t N> inline constexpr vec<T, N> operator*(const vec<T, N>& lhs, T rhs) { return detail::mul_helper(lhs, rhs, std::make_index_sequence<N>{}); }
-    template<typename T, std::size_t N> inline constexpr vec<T, N> operator*(T lhs, const vec<T, N>& rhs) { return detail::mul_helper(rhs, lhs, std::make_index_sequence<N>{}); }
-    template<typename T, std::size_t N> inline constexpr vec<T, N> operator/(const vec<T, N>& lhs, T rhs) { return detail::div_helper(lhs, rhs, std::make_index_sequence<N>{}); }
+
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N> operator*(const vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::mul_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<N>{}); }
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N> operator*(U lhs, const vec<T, N>& rhs) requires std::is_convertible_v<U, T>
+    { return detail::mul_helper(rhs, static_cast<T>(lhs), std::make_index_sequence<N>{}); }
+    template<typename T, typename U, std::size_t N> inline constexpr vec<T, N> operator/(const vec<T, N>& lhs, U rhs) requires std::is_convertible_v<U, T>
+    { return detail::div_helper(lhs, static_cast<T>(rhs), std::make_index_sequence<N>{}); }
 
     template<typename T, std::size_t N> inline constexpr vec<T, N> mul(const vec<T, N>& lhs, const vec<T, N>& rhs)
     { return detail::mul_helper(lhs, rhs, std::make_index_sequence<N>{}); }
     
     template<typename T, std::size_t N> inline constexpr T dot(const vec<T, N>& lhs, const vec<T, N>& rhs)
-    { return detail::dot_helper(lhs, rhs, std::make_index_sequence<N>{}); }
+    { return detail::dot_helper<T>(lhs, rhs, std::make_index_sequence<N>{}); }
 
     template<typename T, std::size_t N> inline constexpr T length_sqr(const vec<T, N>& lhs) { return dot(lhs, lhs); }
     template<typename T, std::size_t N> inline constexpr T length(const vec<T, N>& lhs) { return std::sqrt(length_sqr(lhs)); }

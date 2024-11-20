@@ -1,6 +1,9 @@
 #ifndef _RENA_MATHEMATICS_MAT_HPP_
 #define _RENA_MATHEMATICS_MAT_HPP_
 
+#include "vec.hpp"
+
+#include <type_traits>
 #include <cstddef>
 
 namespace rnm
@@ -10,15 +13,15 @@ namespace rnm
 
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator+=(mat<T, R, C>& lhs, const mat<T, R, C>& rhs);
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator-=(mat<T, R, C>& lhs, const mat<T, R, C>& rhs);
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator*=(mat<T, R, C>& lhs, T rhs);
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator/=(mat<T, R, C>& lhs, T rhs);
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator*=(mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>;
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C>& operator/=(mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>;
 
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator -(const mat<T, R, C>& lhs);
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator +(const mat<T, R, C>& lhs, const mat<T, R, C>& rhs);
     template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator -(const mat<T, R, C>& lhs, const mat<T, R, C>& rhs);
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(const mat<T, R, C>& lhs, T rhs);
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(T lhs, const mat<T, R, C>& rhs);
-    template<typename T, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator /(const mat<T, R, C>& lhs, T rhs);
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(const mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>;
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(U lhs, const mat<T, R, C>& rhs) requires std::is_convertible_v<U, T>;
+    template<typename T, typename U, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator /(const mat<T, R, C>& lhs, U rhs) requires std::is_convertible_v<U, T>;
 
     template<typename T, std::size_t CR, std::size_t R, std::size_t C> inline constexpr mat<T, R, C> operator *(const mat<T, R, CR>& lhs, const mat<T, CR, C>& rhs);
     

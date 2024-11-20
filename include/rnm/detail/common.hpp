@@ -27,7 +27,7 @@ namespace rnm
         template<typename U, typename T, std::size_t... I> rnm_forceinline constexpr U div_helper(const U& lhs, const T& rhs, const std::index_sequence<I...>&)
         { return U((lhs[I] / rhs)...); }
 
-        template<typename T, std::size_t N, std::size_t... I> rnm_forceinline constexpr T dot_helper(const vec<T, N>& lhs, const vec<T, N>& rhs, const std::index_sequence<I...>&)
+        template<typename T, typename U, std::size_t... I> rnm_forceinline constexpr T dot_helper(const U& lhs, const U& rhs, const std::index_sequence<I...>&)
         { return ((lhs[I] * rhs[I]) + ...); }
 
         template<typename U, std::size_t... I> rnm_forceinline constexpr U& addr_helper(U& lhs, const U& rhs, const std::index_sequence<I...>&)
