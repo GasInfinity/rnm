@@ -60,6 +60,17 @@ TEST(VecTest, DotProduct) {
     EXPECT_FLOAT_EQ(result, 12.0f);  // 1*4 + 2*(-5) + 3*6 = 4 - 10 + 18 = 12
 }
 
+TEST(VecTest, CrossProduct) {
+    vec3<float> v1{1.0f, 2.0f, 3.0f};
+    vec3<float> v2{4.0f, -5.0f, 6.0f};
+    vec3<float> result = cross(v1, v2);
+     
+    EXPECT_FLOAT_EQ(result.x, 27.f);
+    EXPECT_FLOAT_EQ(result.y, 6.f);
+    EXPECT_FLOAT_EQ(result.z, -13.f);
+}
+
+
 TEST(VecTest, LengthSquared) {
     vec3<float> v{1.0f, 2.0f, 3.0f};
     float result = length_sqr(v);
