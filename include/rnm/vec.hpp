@@ -31,6 +31,9 @@ namespace rnm
     template<typename T, std::size_t N> inline constexpr T distance(const vec<T, N>& lhs, const vec<T, N>& rhs);
     template<typename T, std::size_t N> inline constexpr vec<T, N> lerp(const vec<T, N>& lhs, const vec<T, N>& rhs, T t);
 
+    template<typename T, std::size_t N> inline constexpr vec<T, N> reflect(const vec<T, N>& i, const vec<T, N>& n);
+    template<typename T, std::size_t N> inline constexpr vec<T, N> refract(const vec<T, N>& i, const vec<T, N>& n, T eta);
+
     template<typename T> inline constexpr vec<T, 3> cross(const vec<T, 3>& lhs, const vec<T, 3>& rhs);
     template<typename T> inline constexpr vec<T, 2> perpendicular_right(const vec<T, 2>& lhs);
     template<typename T> inline constexpr vec<T, 2> perpendicular_left(const vec<T, 2>& lhs);

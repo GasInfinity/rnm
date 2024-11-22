@@ -195,8 +195,16 @@ namespace rnm
     template<typename T, std::size_t N> inline constexpr T distance(const vec<T, N>& lhs, const vec<T, N>& rhs) { return length(lhs - rhs); }
     template<typename T, std::size_t N> inline constexpr vec<T, N> lerp(const vec<T, N>& lhs, const vec<T, N>& rhs, T t) { return lhs + (rhs - lhs) * t; }
 
+    template<typename T, std::size_t N> inline constexpr vec<T, N> reflect(const vec<T, N>& i, const vec<T, N>& n) { return i - 2 * dot(i, n) * n; }
+    template<typename T, std::size_t N> inline constexpr vec<T, N> refract(const vec<T, N>& i, const vec<T, N>& n, T eta) {
+        T cos_theta = std::min(dot(-i, n), static_cast<T>(1));
+        vec<T, N> out_perp = eta * (i + cos_theta * n);
+        vec<T, N> out_parall = -std::sqrt(std::abs(static_cast<T>(1) - length_sqr(out_perp))) * n;
+        return out_perp + out_parall;
+    }
+
     template<typename T> inline constexpr vec<T, 3> cross(const vec<T, 3>& lhs, const vec<T, 3>& rhs)
-    { return vec<T, 3>((lhs[1] * rhs[2]) - (rhs[2] * lhs[1]), (lhs[2] * rhs[0]) - (lhs[0] * rhs[2]), (lhs[0] * rhs[1]) - (lhs[1] * rhs[0])); }
+    { return vec<T, 3>((lhs[1] * rhs[2]) - (lhs[2] * rhs[1]), (lhs[2] * rhs[0]) - (lhs[0] * rhs[2]), (lhs[0] * rhs[1]) - (lhs[1] * rhs[0])); }
     template<typename T> inline constexpr vec<T, 2> perpendicular_right(const vec<T, 2>& lhs) { return vec<T, 2>(lhs[1], -lhs[0]); }
     template<typename T> inline constexpr vec<T, 2> perpendicular_left(const vec<T, 2>& lhs) { return vec<T, 2>(-lhs[1], lhs[0]); }
 } // namespace rnm
