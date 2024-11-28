@@ -17,11 +17,14 @@ namespace rnm
     template<typename T> inline constexpr mat<T, 2, 2> shear_linear(const vec<T, 2>& shear);
     template<typename T> inline constexpr mat<T, 2, 2> rotate_linear(T rotation);
 
-    /* Projections */
+    /* Projections 
+     * When multiplied, the homogeneous vector result will be in the range -1 .. 1 for x and y, and 0 .. 1 for z
+     * Assuming -1 -> top left in the y coordinate
+     * a.k.a: D3D and VK. OGL will need GL_ARB_clip_control or an extra transformation
+     * */
     template<typename T> inline constexpr mat<T, 3, 3> ortho(T left, T right, T bottom, T top);
     template<typename T> inline constexpr mat<T, 4, 4> ortho(T left, T right, T bottom, T top, T near, T far);
-
-    
+    template<typename T> inline constexpr mat<T, 4, 4> perspective(T vfov, T aspect, T near, T far);
 }
 
 #include "detail/mat_transformations.hpp"

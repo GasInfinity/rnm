@@ -53,12 +53,32 @@ namespace rnm
                             sin,  cos);
     }
 
-    /* Projections */
+    /* Projections 
+     * When multiplied, the homogeneous vector result will be in the range -1 .. 1 for x and y, and 0 .. 1 for z
+     * Assuming -1 -> top left in the y coordinate
+     * a.k.a: D3D and VK. OGL will need GL_ARB_clip_control or an extra transformation
+     * */
     template<typename T> inline constexpr mat<T, 3, 3> ortho(T left, T right, T bottom, T top)
-    { return mat<T, 3, 3>(2 / (right - left), 0, -((right + left) / (right - left)), 0, 2 / (top - bottom), -((top + bottom) / (top - bottom)), 0, 0, 1); }
+    {
+        const T w = right - left;
+        const T h = top - bottom;
+        return mat<T, 3, 3>(2 / w, 0, -((right + left) / w), 0, 2 / h, -((top + bottom) / h), 0, 0, 1);
+    }
 
     template<typename T> inline constexpr mat<T, 4, 4> ortho(T left, T right, T bottom, T top, T near, T far)
-    { return mat<T, 4, 4>(2 / (right - left), 0, 0, -((right + left) / (right - left)), 0, 2 / (top - bottom), 0, -((top + bottom) / (top - bottom)), 0, 0, 2 / (far - near), -((far + near) / (far - near)), 0, 0, 0, 1); }
+    {
+        const T w = right - left;
+        const T h = top - bottom;
+        const T d = far - near;
+        return mat<T, 4, 4>(2 / w, 0, 0, -((right + left) / w), 0, 2 / h, 0, -((top + bottom) / h), 0, 0, 1 / d, -near / d, 0, 0, 0, 1);
+    }
+
+    template<typename T> inline constexpr mat<T, 4, 4> perspective(T vfov, T aspect, T near, T far)
+    {
+        const T half_vfov_tan = std::tan(vfov / static_cast<T>(2));
+        const T d = far - near;
+        return mat<T, 4, 4>(1 / (aspect * half_vfov_tan), 0, 0, 0, 0, 1 / half_vfov_tan, 0, 0, 0, 0, (near + far) / d, -(near * far) / d, 0, 0, 1, 0);
+    }
 }
 
 #endif // _RENA_MATHEMATICS_DETAIL_MAT_TRANSFORMATIONS_HPP_
